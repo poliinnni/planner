@@ -1137,7 +1137,16 @@ function nextDay() {
   currentDay = (currentDay + 1) % 7;
   showCurrentMobileDay();
 }
-
+window.login = login;
+window.logout = logout;
+window.saveTemplatePrompt = saveTemplatePrompt;
+window.resetWeek = resetWeek;
+window.setMobileMode = setMobileMode;
+window.previousDay = previousDay;
+window.nextDay = nextDay;
+window.closeModal = closeModal;
+window.saveTask = saveTask;
+window.deleteTask = deleteTask;
 /* ЗАПУСК */
 
 loadLocal();
