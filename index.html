@@ -1,0 +1,559 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Конструктор недели</title>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+<style>
+:root {
+  --bg: #FFF7E6;
+  --text: #2D3A47;
+  --school: #A9B7C6;
+  --yal: #B46A72;
+  --math: #F7C8D3;
+  --sport: #A8B58A;
+  --personal: #FFF7E6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 24px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin-top: 6px;
+  opacity: .65;
+  font-size: 13px;
+}
+
+button {
+  border: 1px solid var(--text);
+  background: transparent;
+  color: var(--text);
+  padding: 9px 13px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+button:hover { background: #f2e8d6; }
+
+.view-switch {
+  display: none;
+  gap: 7px;
+}
+
+.view-switch button.active {
+  background: var(--text);
+  color: white;
+}
+
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(130px, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.day {
+  min-width: 0;
+  border: 1px solid #e8ddc9;
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(255,255,255,.28);
+}
+
+.day.today {
+  outline: 1.5px solid var(--yal);
+  outline-offset: 1px;
+}
+
+.day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.day-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+.day-actions {
+  display: flex;
+  gap: 3px;
+}
+
+.day-actions button {
+  border: none;
+  padding: 3px 5px;
+  font-size: 17px;
+}
+
+.tasks {
+  min-height: 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.task {
+  position: relative;
+  padding: 9px 8px 9px 11px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(45,58,71,.08);
+  font-size: 12px;
+  cursor: grab;
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+
+.task::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: currentColor;
+  opacity: .65;
+}
+
+.task-time {
+  font-size: 11px;
+  opacity: .75;
+  margin-bottom: 5px;
+}
+
+.task-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.task.school { background: var(--school); }
+.task.yal { background: var(--yal); color: white; }
+.task.math { background: var(--math); }
+.task.sport { background: var(--sport); }
+.task.personal {
+  background: var(--personal);
+  border-color: var(--text);
+}
+
+.task-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 3px;
+  margin-top: 5px;
+}
+
+.task-buttons button {
+  border: none;
+  padding: 2px 4px;
+  font-size: 11px;
+}
+
+.add-task {
+  width: 100%;
+  margin-top: 9px;
+  border-style: dashed;
+  opacity: .7;
+}
+
+.add-task:hover { opacity: 1; }
+
+.empty {
+  color: #8d8b82;
+  font-size: 11px;
+  text-align: center;
+  padding: 10px 0;
+}
+
+dialog {
+  border: 1px solid #e2d7c4;
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 22px;
+  width: min(360px, calc(100% - 30px));
+}
+
+dialog::backdrop { background: rgba(45,58,71,.35); }
+
+dialog h2 { margin-top: 0; font-size: 20px; }
+
+form label {
+  display: block;
+  font-size: 12px;
+  margin: 12px 0 5px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d7cbb8;
+  border-radius: 7px;
+  background: white;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.sortable-ghost { opacity: .35; }
+
+@media (max-width: 900px) {
+  body { padding: 15px; }
+  .view-switch { display: flex; }
+  .week { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .week.day-view { display: block; }
+  .week.day-view .day { display: none; }
+  .week.day-view .day.selected { display: block; }
+}
+
+@media (max-width: 520px) {
+  .week {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+    padding: 2px 2px 12px;
+  }
+  .week .day {
+    flex: 0 0 85%;
+    scroll-snap-align: center;
+  }
+  .week.grid-view {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+  .week.grid-view .day { display: block; }
+  .week.day-view { display: block; }
+  .week.day-view .day { display: none; }
+  .week.day-view .day.selected { display: block; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Конструктор недели</h1>
+    <div class="subtitle">Твоя неделя в одном месте</div>
+  </div>
+  <div class="view-switch">
+    <button id="dayMode" class="active">День</button>
+    <button id="weekMode">Неделя</button>
+  </div>
+</header>
+
+<main class="week" id="week"></main>
+
+<dialog id="taskDialog">
+  <form id="taskForm">
+    <h2 id="dialogTitle">Новая задача</h2>
+
+    <label for="taskName">Название</label>
+    <input id="taskName" required maxlength="60" placeholder="Например, математика">
+
+    <label for="taskStart">Начало</label>
+    <input id="taskStart" type="time" required>
+
+    <label for="taskEnd">Конец</label>
+    <input id="taskEnd" type="time" required>
+
+    <label for="taskCategory">Категория</label>
+    <select id="taskCategory">
+      <option value="school">Школа</option>
+      <option value="yal">Яндекс Лицей</option>
+      <option value="math">Профмат</option>
+      <option value="sport">Спорт</option>
+      <option value="personal">Личное</option>
+    </select>
+
+    <div class="modal-buttons">
+      <button type="button" id="cancelTask">Отмена</button>
+      <button type="submit">Сохранить</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const days = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
+
+const initialData = [
+  [
+    ["Школа","08:30","15:25","school"],
+    ["ЯЛ","16:30","18:30","yal"],
+    ["Профмат","19:30","23:00","math"]
+  ],
+  [
+    ["Школа","08:30","15:25","school"],
+    ["ЯЛ ДЗ","15:45","19:45","yal"],
+    ["Профмат","20:30","23:00","math"]
+  ],
+  [
+    ["Школа","08:30","19:30","school"],
+    ["Зал","21:00","21:45","sport"],
+    ["Личное","22:00","22:40","personal"]
+  ],
+  [
+    ["Школа","08:30","15:25","school"],
+    ["Профмат","15:40","16:20","math"],
+    ["ЯЛ","16:30","18:30","yal"],
+    ["Профмат","19:30","23:00","math"]
+  ],
+  [
+    ["Школа","08:30","15:25","school"],
+    ["Школьное ДЗ","16:00","19:30","school"],
+    ["Профмат","20:00","23:30","math"]
+  ],
+  [
+    ["Йога","11:00","12:30","sport"],
+    ["Профмат","13:30","17:30","math"],
+    ["ЯЛ ДЗ","17:30","20:30","yal"],
+    ["Зал","21:00","21:45","sport"]
+  ],
+  [
+    ["Профмат","11:00","15:00","math"],
+    ["Школьное ДЗ","16:00","19:00","school"]
+  ]
+];
+
+let weekData = JSON.parse(localStorage.getItem("weekData")) || initialData;
+let templates = JSON.parse(localStorage.getItem("weekTemplates")) || {};
+let editing = null;
+let selectedDay = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+let mode = "day";
+
+const week = document.getElementById("week");
+const dialog = document.getElementById("taskDialog");
+const form = document.getElementById("taskForm");
+
+function save() {
+  localStorage.setItem("weekData", JSON.stringify(weekData));
+  localStorage.setItem("weekTemplates", JSON.stringify(templates));
+}
+
+function toMinutes(time) {
+  const [h,m] = time.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function sortDay(day) {
+  day.sort((a,b) => toMinutes(a[1]) - toMinutes(b[1]));
+}
+
+function render() {
+  week.innerHTML = "";
+  week.className = "week " + (mode === "day" ? "day-view" : "grid-view");
+
+  weekData.forEach((tasks, index) => {
+    sortDay(tasks);
+
+    const day = document.createElement("section");
+    day.className = "day";
+    if (index === selectedDay) day.classList.add("selected");
+    if (index === selectedDay && mode === "day" ||
+        index === (new Date().getDay() + 6) % 7) {
+      day.classList.add("today");
+    }
+
+    const head = document.createElement("div");
+    head.className = "day-head";
+
+    const name = document.createElement("span");
+    name.className = "day-name";
+    name.textContent = days[index];
+
+    const actions = document.createElement("div");
+    actions.className = "day-actions";
+
+    const heart = document.createElement("button");
+    heart.textContent = templates[index] ? "♥" : "♡";
+    heart.title = "Сохранить или загрузить шаблон";
+    heart.addEventListener("click", () => {
+      if (templates[index]) {
+        if (confirm("Загрузить сохранённый шаблон этого дня?")) {
+          weekData[index] = JSON.parse(JSON.stringify(templates[index]));
+          save();
+          render();
+        }
+      } else {
+        templates[index] = JSON.parse(JSON.stringify(weekData[index]));
+        save();
+        render();
+      }
+    });
+
+    actions.append(heart);
+    head.append(name, actions);
+
+    const list = document.createElement("div");
+    list.className = "tasks";
+
+    if (tasks.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent = "Пока свободно";
+      list.append(empty);
+    }
+
+    tasks.forEach((task, taskIndex) => {
+      const card = document.createElement("article");
+      card.className = "task " + task[3];
+
+      const time = document.createElement("div");
+      time.className = "task-time";
+      time.textContent = task[1] + " – " + task[2];
+
+      const taskName = document.createElement("div");
+      taskName.className = "task-name";
+      taskName.textContent = task[0];
+
+      const buttons = document.createElement("div");
+      buttons.className = "task-buttons";
+
+      const edit = document.createElement("button");
+      edit.textContent = "Изменить";
+      edit.addEventListener("click", () => openEdit(index, taskIndex));
+
+      const remove = document.createElement("button");
+      remove.textContent = "Удалить";
+      remove.addEventListener("click", () => {
+        weekData[index].splice(taskIndex, 1);
+        save();
+        render();
+      });
+
+      buttons.append(edit, remove);
+      card.append(time, taskName, buttons);
+      list.append(card);
+    });
+
+    new Sortable(list, {
+      group: "weekTasks",
+      animation: 150,
+      delay: 120,
+      delayOnTouchOnly: true,
+      touchStartThreshold: 5,
+      onEnd: event => {
+        const from = Number(event.from.closest(".day").dataset.day);
+        const to = Number(event.to.closest(".day").dataset.day);
+        const moved = weekData[from].splice(event.oldIndex, 1)[0];
+        weekData[to].splice(event.newIndex, 0, moved);
+        sortDay(weekData[from]);
+        sortDay(weekData[to]);
+        save();
+        render();
+      }
+    });
+
+    day.dataset.day = index;
+
+    const add = document.createElement("button");
+    add.className = "add-task";
+    add.textContent = "+ Добавить задачу";
+    add.addEventListener("click", () => openNew(index));
+
+    day.append(head, list, add);
+    week.append(day);
+  });
+}
+
+function openNew(day) {
+  editing = {day, index: null};
+  form.reset();
+  document.getElementById("dialogTitle").textContent = "Новая задача";
+  document.getElementById("taskStart").value = "16:00";
+  document.getElementById("taskEnd").value = "17:00";
+  dialog.showModal();
+}
+
+function openEdit(day, index) {
+  editing = {day, index};
+  const task = weekData[day][index];
+  document.getElementById("dialogTitle").textContent = "Изменить задачу";
+  document.getElementById("taskName").value = task[0];
+  document.getElementById("taskStart").value = task[1];
+  document.getElementById("taskEnd").value = task[2];
+  document.getElementById("taskCategory").value = task[3];
+  dialog.showModal();
+}
+
+form.addEventListener("submit", event => {
+  event.preventDefault();
+
+  const name = document.getElementById("taskName").value.trim();
+  const start = document.getElementById("taskStart").value;
+  const end = document.getElementById("taskEnd").value;
+  const category = document.getElementById("taskCategory").value;
+
+  if (!name || !start || !end || toMinutes(end) <= toMinutes(start)) {
+    alert("Проверь название и время задачи.");
+    return;
+  }
+
+  const task = [name, start, end, category];
+
+  if (editing.index === null) {
+    weekData[editing.day].push(task);
+  } else {
+    weekData[editing.day][editing.index] = task;
+  }
+
+  sortDay(weekData[editing.day]);
+  save();
+  dialog.close();
+  render();
+});
+
+document.getElementById("cancelTask").addEventListener("click", () => dialog.close());
+
+document.getElementById("dayMode").addEventListener("click", () => {
+  mode = "day";
+  document.getElementById("dayMode").classList.add("active");
+  document.getElementById("weekMode").classList.remove("active");
+  render();
+});
+
+document.getElementById("weekMode").addEventListener("click", () => {
+  mode = "week";
+  document.getElementById("weekMode").classList.add("active");
+  document.getElementById("dayMode").classList.remove("active");
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
