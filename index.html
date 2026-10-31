@@ -4,456 +4,88 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Конструктор недели</title>
-
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
-
 <style>
 :root {
-  --bg: #FFF7E6;
-  --text: #2D3A47;
-  --muted: #89939C;
-  --school: #A9B7C6;
-  --yal: #B46A72;
-  --math: #F7C8D3;
-  --sport: #A8B58A;
-  --personal: #FFF7E6;
-  --border: #E8DFD0;
-  --white: #FFFCF6;
+  --bg:#FFF7E6;
+  --text:#2D3A47;
+  --muted:#89939C;
+  --school:#A9B7C6;
+  --yal:#B46A72;
+  --math:#F7C8D3;
+  --sport:#A8B58A;
+  --border:#E8DFD0;
+  --white:#FFFCF6;
 }
-
-* {
-  box-sizing: border-box;
+*{box-sizing:border-box}
+body{margin:0;padding:24px;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--text);border-radius:12px;padding:10px 14px}
+button:hover{background:#F3EBDD}
+.primary{background:var(--yal);border-color:var(--yal);color:white}
+.primary:hover{background:#9F5962}
+header{max-width:1500px;margin:0 auto 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+h1{margin:0;font-size:30px}
+.subtitle{color:var(--muted);margin-top:6px;font-size:13px}
+.header-actions,.auth-panel,.legend,.templates-top,.template-list{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.auth-panel,.legend,.week,.templates,.mobile-switch{max-width:1500px;margin-left:auto;margin-right:auto}
+.auth-panel{margin-bottom:18px;padding:14px 16px;background:var(--white);border:1px solid var(--border);border-radius:16px}
+.auth-panel input{min-width:200px;max-width:320px;flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px}
+#authStatus,#authMessage{font-size:12px;color:var(--muted)}
+#authMessage{flex-basis:100%}
+.legend{margin-bottom:18px;gap:14px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.dot{width:10px;height:10px;border-radius:50%}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+.day{min-width:0;background:rgba(255,255,255,.45);border:1px solid var(--border);border-radius:16px;padding:10px;min-height:430px}
+.day.today{border:2px solid var(--yal)}
+.day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:4px}
+.day-name{font-weight:700;font-size:14px}
+.day-date{font-size:11px;color:var(--muted);margin-top:3px}
+.add-day{padding:5px 9px;font-size:17px}
+.tasks{min-height:350px;display:flex;flex-direction:column;gap:8px}
+.task{border-radius:11px;padding:10px;cursor:grab;border-left:4px solid transparent;background:var(--white);font-size:12px;overflow-wrap:anywhere}
+.task:active{cursor:grabbing}
+.task-time{font-size:10px;opacity:.7;margin-bottom:5px}
+.task-title{font-weight:700;line-height:1.35}
+.task-actions{display:flex;justify-content:flex-end;margin-top:7px}
+.task-actions button{padding:3px 7px;border:0;background:rgba(255,255,255,.6);font-size:11px}
+.task.school{background:#E2E8ED;border-color:var(--school)}
+.task.yal{background:#F0D9DB;border-color:var(--yal)}
+.task.math{background:#F9E1E7;border-color:var(--math)}
+.task.sport{background:#E2E8D9;border-color:var(--sport)}
+.task.personal{background:#FFF7E6;border-color:#E5D9C2}
+.empty{text-align:center;color:#B8B0A4;font-size:11px;padding:30px 5px;pointer-events:none}
+.templates{margin-top:20px;background:rgba(255,255,255,.45);border:1px solid var(--border);border-radius:16px;padding:16px}
+.templates-top{justify-content:space-between}
+.templates h3{margin:0;font-size:15px}
+.template-item{display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:7px 10px;font-size:12px}
+.template-item button{border:0;padding:3px;background:transparent}
+.heart{color:var(--yal);font-size:19px}
+.modal-backdrop{display:none;position:fixed;inset:0;z-index:10;background:rgba(45,58,71,.35);align-items:center;justify-content:center;padding:16px}
+.modal{width:100%;max-width:420px;background:var(--white);border-radius:20px;padding:22px;box-shadow:0 12px 50px rgba(0,0,0,.12)}
+.modal h2{margin:0 0 18px;font-size:20px}
+.form-field{margin-bottom:13px}
+.form-field label{display:block;font-size:12px;margin-bottom:6px;color:var(--muted)}
+.form-field input,.form-field select{width:100%;padding:11px;border:1px solid var(--border);border-radius:10px;background:white;color:var(--text)}
+.modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:20px}
+.modal-actions>div{display:flex;gap:8px}
+.delete-btn{color:#A64E4E}
+.mobile-switch{display:none;margin-bottom:12px;gap:8px}
+.mobile-switch button.active{background:var(--yal);color:white}
+@media(max-width:1000px){.week{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:700px){
+  body{padding:16px 10px}
+  h1{font-size:24px}
+  .mobile-switch{display:flex}
+  .week{grid-template-columns:1fr}
+  .day{display:none;min-height:350px}
+  .day.mobile-visible{display:block}
+  .tasks{min-height:250px}
 }
-
-body {
-  margin: 0;
-  padding: 24px;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, sans-serif;
-}
-
-button, input, select {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-header {
-  max-width: 1500px;
-  margin: 0 auto 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-h1 {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 700;
-}
-
-.subtitle {
-  color: var(--muted);
-  margin-top: 6px;
-  font-size: 13px;
-}
-
-.header-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-button {
-  border: 1px solid var(--border);
-  background: var(--white);
-  color: var(--text);
-  border-radius: 12px;
-  padding: 10px 14px;
-}
-
-button:hover {
-  background: #F3EBDD;
-}
-
-.primary {
-  background: var(--yal);
-  border-color: var(--yal);
-  color: white;
-}
-
-.primary:hover {
-  background: #9F5962;
-}
-
-#authStatus {
-  font-size: 12px;
-  color: var(--muted);
-  max-width: 190px;
-}
-
-.auth-panel {
-  max-width: 1500px;
-  margin: 0 auto 18px;
-  padding: 14px 16px;
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.auth-panel input {
-  min-width: 200px;
-  flex: 1;
-  max-width: 320px;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: white;
-  color: var(--text);
-}
-
-#authMessage {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.legend {
-  max-width: 1500px;
-  margin: 0 auto 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.week {
-  max-width: 1500px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.day {
-  min-width: 0;
-  background: rgba(255,255,255,.45);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 10px;
-  min-height: 430px;
-  transition: border .2s;
-}
-
-.day.today {
-  border: 2px solid var(--yal);
-}
-
-.day-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  gap: 4px;
-}
-
-.day-name {
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.day-date {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 3px;
-}
-
-.add-day {
-  padding: 5px 9px;
-  border-radius: 8px;
-  font-size: 17px;
-}
-
-.tasks {
-  min-height: 350px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.task {
-  border-radius: 11px;
-  padding: 10px;
-  cursor: grab;
-  border-left: 4px solid transparent;
-  background: var(--white);
-  font-size: 12px;
-  position: relative;
-  overflow-wrap: anywhere;
-}
-
-.task:active {
-  cursor: grabbing;
-}
-
-.task-time {
-  font-size: 10px;
-  opacity: .7;
-  margin-bottom: 5px;
-}
-
-.task-title {
-  font-weight: 700;
-  line-height: 1.35;
-}
-
-.task-category {
-  margin-top: 5px;
-  font-size: 10px;
-  opacity: .7;
-}
-
-.task.school {
-  background: #E2E8ED;
-  border-color: var(--school);
-}
-
-.task.yal {
-  background: #F0D9DB;
-  border-color: var(--yal);
-}
-
-.task.math {
-  background: #F9E1E7;
-  border-color: var(--math);
-}
-
-.task.sport {
-  background: #E2E8D9;
-  border-color: var(--sport);
-}
-
-.task.personal {
-  background: #FFF7E6;
-  border-color: #E5D9C2;
-}
-
-.task-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 4px;
-  margin-top: 7px;
-}
-
-.task-actions button {
-  padding: 3px 6px;
-  border: none;
-  background: rgba(255,255,255,.55);
-  font-size: 11px;
-}
-
-.empty {
-  text-align: center;
-  color: #B8B0A4;
-  font-size: 11px;
-  padding: 30px 5px;
-  pointer-events: none;
-}
-
-.templates {
-  max-width: 1500px;
-  margin: 20px auto 0;
-  background: rgba(255,255,255,.45);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
-}
-
-.templates-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.templates h3 {
-  margin: 0;
-  font-size: 15px;
-}
-
-.template-list {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-
-.template-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 7px 10px;
-  font-size: 12px;
-}
-
-.template-item button {
-  border: none;
-  padding: 3px;
-  background: transparent;
-}
-
-.heart {
-  color: var(--yal);
-  font-size: 19px;
-}
-
-.modal-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  background: rgba(45,58,71,.35);
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-
-.modal {
-  width: 100%;
-  max-width: 420px;
-  background: var(--white);
-  border-radius: 20px;
-  padding: 22px;
-  box-shadow: 0 12px 50px rgba(0,0,0,.12);
-}
-
-.modal h2 {
-  margin: 0 0 18px;
-  font-size: 20px;
-}
-
-.form-field {
-  margin-bottom: 13px;
-}
-
-.form-field label {
-  display: block;
-  font-size: 12px;
-  margin-bottom: 6px;
-  color: var(--muted);
-}
-
-.form-field input,
-.form-field select {
-  width: 100%;
-  padding: 11px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: white;
-  color: var(--text);
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 20px;
-}
-
-.modal-actions div {
-  display: flex;
-  gap: 8px;
-}
-
-.delete-btn {
-  color: #A64E4E;
-}
-
-.mobile-switch {
-  display: none;
-  max-width: 1500px;
-  margin: 0 auto 12px;
-  gap: 8px;
-}
-
-.mobile-switch button.active {
-  background: var(--yal);
-  color: white;
-}
-
-@media (max-width: 900px) {
-  body {
-    padding: 16px 10px;
-  }
-
-  .week {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .day {
-    min-height: 300px;
-  }
-}
-
-@media (max-width: 600px) {
-  h1 {
-    font-size: 24px;
-  }
-
-  .mobile-switch {
-    display: flex;
-  }
-
-  .week {
-    grid-template-columns: 1fr;
-  }
-
-  .day {
-    display: none;
-    min-height: 350px;
-  }
-
-  .day.mobile-visible {
-    display: block;
-  }
-
-  .tasks {
-    min-height: 250px;
-  }
-
-  .header-actions button {
-    font-size: 12px;
-  }
-}
+@media(min-width:701px){.day{display:block!important}}
 </style>
 </head>
-
 <body>
 
 <header>
@@ -461,20 +93,17 @@ button:hover {
     <h1>Конструктор недели</h1>
     <div class="subtitle">Твоя неделя, твои правила</div>
   </div>
-
   <div class="header-actions">
     <span id="authStatus">Не выполнен вход</span>
-    <button onclick="saveTemplatePrompt()" title="Сохранить шаблон">
-      <span class="heart">♥</span>
-    </button>
-    <button onclick="resetWeek()">Сбросить неделю</button>
+    <button id="saveTemplateTop" title="Сохранить шаблон"><span class="heart">♥</span></button>
+    <button id="resetWeekButton">Сбросить неделю</button>
   </div>
 </header>
 
 <div class="auth-panel">
-  <input id="emailInput" type="email" placeholder="Твоя электронная почта">
-  <button class="primary" onclick="login()">Войти / зарегистрироваться</button>
-  <button onclick="logout()" id="logoutButton" style="display:none">Выйти</button>
+  <input id="emailInput" type="email" placeholder="Твоя электронная почта" autocomplete="email">
+  <button class="primary" id="loginButton">Войти / зарегистрироваться</button>
+  <button id="logoutButton" hidden>Выйти</button>
   <span id="authMessage">Войди, чтобы синхронизировать расписание между устройствами.</span>
 </div>
 
@@ -487,10 +116,10 @@ button:hover {
 </div>
 
 <div class="mobile-switch">
-  <button class="active" onclick="setMobileMode('day',this)">День</button>
-  <button onclick="setMobileMode('week',this)">Неделя</button>
-  <button onclick="previousDay()">←</button>
-  <button onclick="nextDay()">→</button>
+  <button id="dayModeButton" class="active">День</button>
+  <button id="weekModeButton">Неделя</button>
+  <button id="previousDayButton">←</button>
+  <button id="nextDayButton">→</button>
 </div>
 
 <main class="week" id="week"></main>
@@ -498,34 +127,28 @@ button:hover {
 <section class="templates">
   <div class="templates-top">
     <h3>♥ Мои шаблоны недели</h3>
-    <button onclick="saveTemplatePrompt()">Сохранить текущую неделю</button>
+    <button id="saveTemplateButton">Сохранить текущую неделю</button>
   </div>
-  <div class="template-list" id="templateList">
-    <span class="subtitle">Пока нет сохранённых шаблонов</span>
-  </div>
+  <div class="template-list" id="templateList" style="margin-top:12px"></div>
 </section>
 
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal">
     <h2 id="modalTitle">Новая задача</h2>
-
     <div class="form-field">
-      <label>Название</label>
+      <label for="taskTitle">Название</label>
       <input id="taskTitle" placeholder="Например, домашнее задание">
     </div>
-
     <div class="form-field">
-      <label>Начало</label>
+      <label for="taskStart">Начало</label>
       <input id="taskStart" type="time" value="16:00">
     </div>
-
     <div class="form-field">
-      <label>Конец</label>
+      <label for="taskEnd">Конец</label>
       <input id="taskEnd" type="time" value="17:00">
     </div>
-
     <div class="form-field">
-      <label>Категория</label>
+      <label for="taskCategory">Категория</label>
       <select id="taskCategory">
         <option value="school">Школа</option>
         <option value="yal">Яндекс Лицей</option>
@@ -534,12 +157,11 @@ button:hover {
         <option value="personal">Личное</option>
       </select>
     </div>
-
     <div class="modal-actions">
-      <button class="delete-btn" id="deleteTaskButton" onclick="deleteTask()" style="display:none">Удалить</button>
+      <button class="delete-btn" id="deleteTaskButton" hidden>Удалить</button>
       <div>
-        <button onclick="closeModal()">Отмена</button>
-        <button class="primary" onclick="saveTask()">Сохранить</button>
+        <button id="cancelModalButton">Отмена</button>
+        <button class="primary" id="saveTaskButton">Сохранить</button>
       </div>
     </div>
   </div>
@@ -548,64 +170,21 @@ button:hover {
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-/* НАСТРОЙКИ SUPABASE */
-
 const SUPABASE_URL = "https://qdhjurhqghtfuilqjjzk.supabase.co";
-const SUPABASE_KEY = "sb_publishable_RC5AZMuslegHJZ9XObdbdQ_IUDWkvGM";
-
+const SUPABASE_KEY = "sb_publishable_RC5AZMuslegHJ9Z9XObdbdQ_IUDWkvGM";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* ДАННЫЕ */
-
-const days = [
-  "Понедельник",
-  "Вторник",
-  "Среда",
-  "Четверг",
-  "Пятница",
-  "Суббота",
-  "Воскресенье"
-];
-
+const days = ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"];
 const shortDays = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
 
 const defaultWeek = [
-  [
-    ["08:30","15:25","Школа","school"],
-    ["16:30","18:30","Яндекс Лицей","yal"],
-    ["19:30","23:00","Профмат","math"]
-  ],
-  [
-    ["08:30","15:25","Школа","school"],
-    ["15:45","19:45","Яндекс Лицей ДЗ","yal"],
-    ["20:30","23:00","Профмат","math"]
-  ],
-  [
-    ["08:30","19:30","Школа","school"],
-    ["21:00","21:45","Зал","sport"],
-    ["22:00","22:40","Личное","personal"]
-  ],
-  [
-    ["08:30","15:25","Школа","school"],
-    ["15:40","16:20","Профмат","math"],
-    ["16:30","18:30","Яндекс Лицей","yal"],
-    ["19:30","23:00","Профмат","math"]
-  ],
-  [
-    ["08:30","15:25","Школа","school"],
-    ["16:00","19:30","Школьное ДЗ","school"],
-    ["20:00","23:30","Профмат","math"]
-  ],
-  [
-    ["11:00","12:30","Йога","sport"],
-    ["13:30","17:30","Профмат","math"],
-    ["17:30","20:30","Яндекс Лицей ДЗ","yal"],
-    ["21:00","21:45","Зал","sport"]
-  ],
-  [
-    ["11:00","15:00","Профмат","math"],
-    ["16:00","19:00","Школьное ДЗ","school"]
-  ]
+  [["08:30","15:25","Школа","school"],["16:30","18:30","Яндекс Лицей","yal"],["19:30","23:00","Профмат","math"]],
+  [["08:30","15:25","Школа","school"],["15:45","19:45","Яндекс Лицей ДЗ","yal"],["20:30","23:00","Профмат","math"]],
+  [["08:30","19:30","Школа","school"],["21:00","21:45","Зал","sport"],["22:00","22:40","Личное","personal"]],
+  [["08:30","15:25","Школа","school"],["15:40","16:20","Профмат","math"],["16:30","18:30","Яндекс Лицей","yal"],["19:30","23:00","Профмат","math"]],
+  [["08:30","15:25","Школа","school"],["16:00","19:30","Школьное ДЗ","school"],["20:00","23:30","Профмат","math"]],
+  [["11:00","12:30","Йога","sport"],["13:30","17:30","Профмат","math"],["17:30","20:30","Яндекс Лицей ДЗ","yal"],["21:00","21:45","Зал","sport"]],
+  [["11:00","15:00","Профмат","math"],["16:00","19:00","Школьное ДЗ","school"]]
 ];
 
 let weekData = [];
@@ -616,38 +195,24 @@ let editing = null;
 let currentUser = null;
 let saveTimer = null;
 let applyingCloudData = false;
+let lastCloudUpdate = 0;
 
-/* ПОДГОТОВКА РАСПИСАНИЯ */
-
-function createId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-}
+const $ = id => document.getElementById(id);
+const clone = value => JSON.parse(JSON.stringify(value));
+const makeId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
 
 function createDefaultWeek() {
-  return defaultWeek.map(day =>
-    day.map(task => ({
-      id: createId(),
-      start: task[0],
-      end: task[1],
-      title: task[2],
-      category: task[3]
-    }))
-  );
+  return defaultWeek.map(day => day.map(t => ({
+    id:makeId(),start:t[0],end:t[1],title:t[2],category:t[3]
+  })));
 }
 
 function loadLocal() {
   try {
-    const savedWeek = localStorage.getItem("weekData");
-    const savedTemplates = localStorage.getItem("weekTemplates");
-
-    weekData = savedWeek ? JSON.parse(savedWeek) : createDefaultWeek();
-    templates = savedTemplates ? JSON.parse(savedTemplates) : [];
-
-    if (!Array.isArray(weekData) || weekData.length !== 7) {
-      weekData = createDefaultWeek();
-    }
-
-    if (!Array.isArray(templates)) templates = [];
+    const w = JSON.parse(localStorage.getItem("weekData") || "null");
+    const t = JSON.parse(localStorage.getItem("weekTemplates") || "[]");
+    weekData = Array.isArray(w) && w.length===7 ? w : createDefaultWeek();
+    templates = Array.isArray(t) ? t : [];
   } catch {
     weekData = createDefaultWeek();
     templates = [];
@@ -655,392 +220,315 @@ function loadLocal() {
 }
 
 function saveLocal() {
-  localStorage.setItem("weekData", JSON.stringify(weekData));
-  localStorage.setItem("weekTemplates", JSON.stringify(templates));
+  localStorage.setItem("weekData",JSON.stringify(weekData));
+  localStorage.setItem("weekTemplates",JSON.stringify(templates));
 }
 
-/* ОБЛАЧНОЕ СОХРАНЕНИЕ */
-
-function scheduleCloudSave() {
+function scheduleSave() {
   saveLocal();
-
   if (!currentUser || applyingCloudData) return;
-
   clearTimeout(saveTimer);
-
-  saveTimer = setTimeout(async () => {
-    await saveCloud();
-  }, 700);
+  saveTimer = setTimeout(saveCloud,800);
 }
 
 async function saveCloud() {
   if (!currentUser) return;
 
-  const data = {
-    weekData,
-    templates
-  };
+  $("authStatus").textContent = "Сохранение...";
 
-  const { error } = await supabase
-    .from("planner_data")
-    .upsert({
-      user_id: currentUser.id,
-      data,
-      updated_at: new Date().toISOString()
-    }, {
-      onConflict: "user_id"
-    });
+  const {error} = await supabase.from("planner_data").upsert({
+    user_id:currentUser.id,
+    data:{weekData,templates},
+    updated_at:new Date().toISOString()
+  },{onConflict:"user_id"});
 
   if (error) {
-    console.error("Ошибка сохранения:", error);
-    document.getElementById("authStatus").textContent = "Ошибка синхронизации";
+    console.error("Supabase save error:",error);
+    $("authStatus").textContent = "Ошибка сохранения";
+    $("authMessage").textContent = "Не удалось сохранить данные: " + error.message;
   } else {
-    document.getElementById("authStatus").textContent = "Синхронизировано";
+    lastCloudUpdate = Date.now();
+    localStorage.setItem("lastCloudUpdate",String(lastCloudUpdate));
+    $("authStatus").textContent = "Синхронизировано";
   }
 }
 
 async function loadCloud() {
   if (!currentUser) return;
 
-  document.getElementById("authStatus").textContent = "Загрузка...";
+  $("authStatus").textContent = "Загрузка...";
 
-  const { data, error } = await supabase
-    .from("planner_data")
-    .select("data")
-    .eq("user_id", currentUser.id)
+  const {data,error} = await supabase.from("planner_data")
+    .select("data,updated_at")
+    .eq("user_id",currentUser.id)
     .maybeSingle();
 
   if (error) {
-    console.error(error);
-    document.getElementById("authStatus").textContent = "Ошибка загрузки";
+    console.error("Supabase load error:",error);
+    $("authStatus").textContent = "Ошибка загрузки";
+    $("authMessage").textContent = "Не удалось загрузить данные: " + error.message;
     return;
   }
 
   applyingCloudData = true;
 
-  if (data && data.data) {
-    if (Array.isArray(data.data.weekData) && data.data.weekData.length === 7) {
+  if (data?.data) {
+    if (Array.isArray(data.data.weekData) && data.data.weekData.length===7) {
       weekData = data.data.weekData;
     }
-
     if (Array.isArray(data.data.templates)) {
       templates = data.data.templates;
     }
 
+    lastCloudUpdate = data.updated_at ? new Date(data.updated_at).getTime() : Date.now();
+    localStorage.setItem("lastCloudUpdate",String(lastCloudUpdate));
     saveLocal();
   } else {
-    // При первом входе переносим существующее расписание в облако.
     await saveCloud();
   }
 
   renderWeek();
   renderTemplates();
-
   applyingCloudData = false;
-
-  document.getElementById("authStatus").textContent = "Синхронизировано";
+  $("authStatus").textContent = "Синхронизировано";
 }
 
-async function login() {
-  const email = document.getElementById("emailInput").value.trim();
-  const message = document.getElementById("authMessage");
+async function sendLoginLink() {
+  const email = $("emailInput").value.trim();
 
-  if (!email || !email.includes("@")) {
-    message.textContent = "Введи корректную электронную почту.";
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    $("authMessage").textContent = "Введи корректный адрес электронной почты.";
     return;
   }
 
-  message.textContent = "Отправляем ссылку для входа...";
+  $("loginButton").disabled = true;
+  $("authMessage").textContent = "Отправляем ссылку для входа...";
 
-  const { error } = await supabase.auth.signInWithOtp({
+  const {error} = await supabase.auth.signInWithOtp({
     email,
-    options: {
-      emailRedirectTo: window.location.href
+    options:{
+      emailRedirectTo:"https://poliinnni.github.io/planner/"
     }
   });
 
+  $("loginButton").disabled = false;
+
   if (error) {
-    message.textContent = "Ошибка: " + error.message;
+    console.error("Supabase login error:",error);
+    $("authMessage").textContent = "Ошибка входа: " + error.message;
   } else {
-    message.textContent = "Проверь почту. Перейди по ссылке для входа.";
+    $("authMessage").textContent = "Письмо отправлено. Открой его и перейди по ссылке для входа.";
   }
 }
 
 async function logout() {
-  await supabase.auth.signOut();
-  currentUser = null;
+  const {error} = await supabase.auth.signOut();
 
-  document.getElementById("authStatus").textContent = "Не выполнен вход";
-  document.getElementById("logoutButton").style.display = "none";
-  document.getElementById("authMessage").textContent = "Ты вышла из аккаунта.";
-
-  renderWeek();
-}
-
-async function handleSession(session) {
-  const previousUser = currentUser;
-  currentUser = session?.user || null;
-
-  if (currentUser) {
-    document.getElementById("logoutButton").style.display = "inline-block";
-    document.getElementById("authStatus").textContent = "Выполнен вход";
-
-    if (!previousUser || previousUser.id !== currentUser.id) {
-      await loadCloud();
-    }
+  if (error) {
+    $("authMessage").textContent = "Ошибка выхода: " + error.message;
   } else {
-    document.getElementById("logoutButton").style.display = "none";
-    document.getElementById("authStatus").textContent = "Не выполнен вход";
+    currentUser = null;
+    $("authStatus").textContent = "Не выполнен вход";
+    $("logoutButton").hidden = true;
+    $("authMessage").textContent = "Ты вышла из аккаунта.";
   }
 }
 
-/* ОТОБРАЖЕНИЕ НЕДЕЛИ */
+async function handleSession(session) {
+  const newUser = session?.user || null;
+  const changed = newUser?.id !== currentUser?.id;
+  currentUser = newUser;
+
+  if (currentUser) {
+    $("logoutButton").hidden = false;
+    $("authStatus").textContent = "Выполнен вход";
+    if (changed) await loadCloud();
+  } else {
+    $("logoutButton").hidden = true;
+    $("authStatus").textContent = "Не выполнен вход";
+  }
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+function getDateForDay(index) {
+  const now = new Date();
+  const monday = new Date(now);
+  monday.setDate(now.getDate()-((now.getDay()+6)%7));
+  monday.setDate(monday.getDate()+index);
+  return monday.toLocaleDateString("ru-RU",{day:"numeric",month:"short"});
+}
 
 function renderWeek() {
-  const container = document.getElementById("week");
+  const container = $("week");
   container.innerHTML = "";
+  const todayIndex = (new Date().getDay()+6)%7;
 
-  const today = new Date();
-  const todayIndex = (today.getDay() + 6) % 7;
+  days.forEach((day,index) => {
+    const section = document.createElement("section");
+    section.className = "day" +
+      (index===todayIndex ? " today" : "") +
+      (index===currentDay ? " mobile-visible" : "");
 
-  days.forEach((day, index) => {
-    const dayElement = document.createElement("section");
-    dayElement.className = "day";
-
-    if (index === todayIndex) {
-      dayElement.classList.add("today");
-    }
-
-    if (index === currentDay) {
-      dayElement.classList.add("mobile-visible");
-    }
-
-    const date = getDateForDay(index);
-
-    dayElement.innerHTML = `
+    section.innerHTML = `
       <div class="day-header">
         <div>
           <div class="day-name">${shortDays[index]}</div>
-          <div class="day-date">${date}</div>
+          <div class="day-date">${getDateForDay(index)}</div>
         </div>
-        <button class="add-day" data-day="${index}">+</button>
+        <button class="add-day" type="button" aria-label="Добавить задачу">+</button>
       </div>
       <div class="tasks" data-day="${index}"></div>
     `;
 
-    dayElement.querySelector(".add-day").addEventListener("click", () => {
-      openModal(index);
-    });
+    section.querySelector(".add-day").addEventListener("click",()=>openModal(index));
 
-    const tasksContainer = dayElement.querySelector(".tasks");
+    const list = section.querySelector(".tasks");
+    const tasks = [...weekData[index]].sort((a,b)=>a.start.localeCompare(b.start));
 
-    const sortedTasks = [...weekData[index]].sort((a,b) =>
-      a.start.localeCompare(b.start)
-    );
-
-    if (sortedTasks.length === 0) {
-      tasksContainer.innerHTML = '<div class="empty">Перетащи сюда задачу<br>или нажми +</div>';
+    if (!tasks.length) {
+      list.innerHTML = '<div class="empty">Здесь пока пусто<br>Нажми +, чтобы добавить задачу</div>';
     }
 
-    sortedTasks.forEach(task => {
-      const taskElement = document.createElement("div");
-      taskElement.className = `task ${task.category}`;
-      taskElement.dataset.id = task.id;
+    tasks.forEach(task => {
+      const card = document.createElement("article");
+      card.className = "task " +
+        (["school","yal","math","sport","personal"].includes(task.category) ? task.category : "personal");
+      card.dataset.id = task.id;
 
-      taskElement.innerHTML = `
-        <div class="task-time">${task.start} – ${task.end}</div>
+      card.innerHTML = `
+        <div class="task-time">${escapeHtml(task.start)} – ${escapeHtml(task.end)}</div>
         <div class="task-title">${escapeHtml(task.title)}</div>
-        <div class="task-actions">
-          <button class="edit-task">Изменить</button>
-        </div>
+        <div class="task-actions"><button type="button">Изменить</button></div>
       `;
 
-      taskElement.querySelector(".edit-task").addEventListener("click", () => {
-        openModal(index, task.id);
-      });
-
-      taskElement.addEventListener("dblclick", () => {
-        openModal(index, task.id);
-      });
-
-      tasksContainer.appendChild(taskElement);
+      card.querySelector("button").addEventListener("click",()=>openModal(index,task.id));
+      card.addEventListener("dblclick",()=>openModal(index,task.id));
+      list.appendChild(card);
     });
 
-    container.appendChild(dayElement);
+    container.appendChild(section);
   });
 
   initSortable();
 }
 
-function getDateForDay(dayIndex) {
-  const now = new Date();
-  const monday = new Date(now);
-
-  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
-
-  const date = new Date(monday);
-  date.setDate(monday.getDate() + dayIndex);
-
-  return date.toLocaleDateString("ru-RU", {
-    day: "numeric",
-    month: "short"
-  });
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  })[char]);
-}
-
-/* ПЕРЕТАСКИВАНИЕ ЗАДАЧ */
-
 function initSortable() {
-  document.querySelectorAll(".tasks").forEach(container => {
-    new Sortable(container, {
-      group: "weekTasks",
-      animation: 180,
-      ghostClass: "sortable-ghost",
+  if (typeof Sortable==="undefined") {
+    console.error("SortableJS не загрузился.");
+    return;
+  }
 
-      onEnd(event) {
-        const oldDay = Number(event.from.dataset.day);
-        const newDay = Number(event.to.dataset.day);
+  document.querySelectorAll(".tasks").forEach(el => {
+    if (el._sortable) el._sortable.destroy();
 
-        const taskId = event.item.dataset.id;
+    el._sortable = new Sortable(el,{
+      group:"weekTasks",
+      animation:180,
+      draggable:".task",
+      onEnd:event => {
+        const from = Number(event.from.dataset.day);
+        const to = Number(event.to.dataset.day);
+        const id = event.item.dataset.id;
+        const index = weekData[from].findIndex(task=>task.id===id);
 
-        const taskIndex = weekData[oldDay].findIndex(
-          task => task.id === taskId
-        );
+        if (index<0) return;
 
-        if (taskIndex === -1) return;
+        const [task] = weekData[from].splice(index,1);
+        weekData[to].push(task);
+        weekData[to].sort((a,b)=>a.start.localeCompare(b.start));
 
-        const [task] = weekData[oldDay].splice(taskIndex, 1);
-
-        weekData[newDay].push(task);
-
-        weekData[newDay].sort((a,b) =>
-          a.start.localeCompare(b.start)
-        );
-
-        scheduleCloudSave();
+        scheduleSave();
         renderWeek();
       }
     });
   });
 }
 
-/* ДОБАВЛЕНИЕ И РЕДАКТИРОВАНИЕ */
-
-function openModal(dayIndex, taskId = null) {
-  editing = taskId ? { dayIndex, taskId } : { dayIndex, taskId: null };
-
-  document.getElementById("modalTitle").textContent =
-    taskId ? "Редактировать задачу" : "Новая задача";
+function openModal(dayIndex,taskId=null) {
+  editing = {dayIndex,taskId};
 
   const task = taskId
-    ? weekData[dayIndex].find(item => item.id === taskId)
+    ? weekData[dayIndex].find(t=>t.id===taskId)
     : null;
 
-  document.getElementById("taskTitle").value = task?.title || "";
-  document.getElementById("taskStart").value = task?.start || "16:00";
-  document.getElementById("taskEnd").value = task?.end || "17:00";
-  document.getElementById("taskCategory").value = task?.category || "personal";
-
-  document.getElementById("deleteTaskButton").style.display =
-    taskId ? "inline-block" : "none";
-
-  document.getElementById("modalBackdrop").style.display = "flex";
+  $("modalTitle").textContent = task ? "Редактировать задачу" : "Новая задача";
+  $("taskTitle").value = task?.title || "";
+  $("taskStart").value = task?.start || "16:00";
+  $("taskEnd").value = task?.end || "17:00";
+  $("taskCategory").value = task?.category || "personal";
+  $("deleteTaskButton").hidden = !task;
+  $("modalBackdrop").style.display = "flex";
 }
 
 function closeModal() {
-  document.getElementById("modalBackdrop").style.display = "none";
+  $("modalBackdrop").style.display = "none";
   editing = null;
 }
 
 function saveTask() {
   if (!editing) return;
 
-  const title = document.getElementById("taskTitle").value.trim();
-  const start = document.getElementById("taskStart").value;
-  const end = document.getElementById("taskEnd").value;
-  const category = document.getElementById("taskCategory").value;
+  const title = $("taskTitle").value.trim();
+  const start = $("taskStart").value;
+  const end = $("taskEnd").value;
+  const category = $("taskCategory").value;
 
-  if (!title) {
-    alert("Введи название задачи.");
-    return;
+  if (!title) return alert("Введи название задачи.");
+  if (!start || !end || start>=end) {
+    return alert("Время окончания должно быть позже времени начала.");
   }
 
-  if (!start || !end || start >= end) {
-    alert("Время окончания должно быть позже времени начала.");
-    return;
-  }
-
-  const day = weekData[editing.dayIndex];
+  const list = weekData[editing.dayIndex];
 
   if (editing.taskId) {
-    const task = day.find(item => item.id === editing.taskId);
-
-    if (task) {
-      Object.assign(task, { title, start, end, category });
-    }
+    const task = list.find(t=>t.id===editing.taskId);
+    if (task) Object.assign(task,{title,start,end,category});
   } else {
-    day.push({
-      id: createId(),
-      title,
-      start,
-      end,
-      category
-    });
+    list.push({id:makeId(),title,start,end,category});
   }
 
-  day.sort((a,b) => a.start.localeCompare(b.start));
-
+  list.sort((a,b)=>a.start.localeCompare(b.start));
   closeModal();
-  scheduleCloudSave();
+  scheduleSave();
   renderWeek();
 }
 
 function deleteTask() {
-  if (!editing || !editing.taskId) return;
+  if (!editing?.taskId) return;
 
-  const day = weekData[editing.dayIndex];
-
-  weekData[editing.dayIndex] = day.filter(
-    task => task.id !== editing.taskId
-  );
+  weekData[editing.dayIndex] =
+    weekData[editing.dayIndex].filter(t=>t.id!==editing.taskId);
 
   closeModal();
-  scheduleCloudSave();
+  scheduleSave();
   renderWeek();
 }
 
-/* ШАБЛОНЫ */
-
 function saveTemplatePrompt() {
   const name = prompt("Название шаблона недели:");
-
-  if (!name || !name.trim()) return;
+  if (!name?.trim()) return;
 
   templates.push({
-    id: createId(),
-    name: name.trim(),
-    data: JSON.parse(JSON.stringify(weekData))
+    id:makeId(),
+    name:name.trim(),
+    data:clone(weekData)
   });
 
-  scheduleCloudSave();
+  scheduleSave();
   renderTemplates();
 }
 
 function renderTemplates() {
-  const container = document.getElementById("templateList");
-  container.innerHTML = "";
+  const box = $("templateList");
+  box.innerHTML = "";
 
   if (!templates.length) {
-    container.innerHTML = '<span class="subtitle">Пока нет сохранённых шаблонов</span>';
+    box.innerHTML = '<span class="subtitle">Пока нет сохранённых шаблонов</span>';
     return;
   }
 
@@ -1048,186 +536,158 @@ function renderTemplates() {
     const item = document.createElement("div");
     item.className = "template-item";
 
-    const name = document.createElement("span");
-    name.textContent = "♥ " + template.name;
+    const label = document.createElement("span");
+    label.textContent = "♥ " + template.name;
 
-    const loadButton = document.createElement("button");
-    loadButton.textContent = "Открыть";
-    loadButton.addEventListener("click", () => loadTemplate(template.id));
+    const open = document.createElement("button");
+    open.type = "button";
+    open.textContent = "Открыть";
+    open.addEventListener("click",()=>{
+      if (!confirm(`Заменить текущую неделю шаблоном «${template.name}»?`)) return;
+      weekData = clone(template.data);
+      scheduleSave();
+      renderWeek();
+    });
 
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "×";
-    deleteButton.title = "Удалить шаблон";
-    deleteButton.addEventListener("click", () => deleteTemplate(template.id));
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "×";
+    remove.title = "Удалить шаблон";
+    remove.addEventListener("click",()=>{
+      templates = templates.filter(t=>t.id!==template.id);
+      scheduleSave();
+      renderTemplates();
+    });
 
-    item.append(name, loadButton, deleteButton);
-    container.appendChild(item);
+    item.append(label,open,remove);
+    box.appendChild(item);
   });
 }
-
-function loadTemplate(id) {
-  const template = templates.find(item => item.id === id);
-
-  if (!template) return;
-
-  if (!confirm(`Заменить текущую неделю шаблоном «${template.name}»?`)) {
-    return;
-  }
-
-  weekData = JSON.parse(JSON.stringify(template.data));
-
-  scheduleCloudSave();
-  renderWeek();
-}
-
-function deleteTemplate(id) {
-  templates = templates.filter(item => item.id !== id);
-
-  scheduleCloudSave();
-  renderTemplates();
-}
-
-/* СБРОС НЕДЕЛИ */
 
 function resetWeek() {
-  if (!confirm("Вернуть исходное расписание? Текущие задачи будут заменены.")) {
-    return;
-  }
-
+  if (!confirm("Вернуть исходное расписание? Текущие задачи будут заменены.")) return;
   weekData = createDefaultWeek();
-
-  scheduleCloudSave();
+  scheduleSave();
   renderWeek();
 }
 
-/* МОБИЛЬНАЯ ВЕРСИЯ */
-
-function setMobileMode(mode, button) {
+function setMobileMode(mode) {
   mobileMode = mode;
+  $("dayModeButton").classList.toggle("active",mode==="day");
+  $("weekModeButton").classList.toggle("active",mode==="week");
+  updateMobileDays();
+}
 
-  document.querySelectorAll(".mobile-switch button").forEach(item => {
-    item.classList.remove("active");
-  });
-
-  button.classList.add("active");
-
-  document.querySelectorAll(".day").forEach((day, index) => {
-    day.classList.toggle(
-      "mobile-visible",
-      mode === "week" || index === currentDay
-    );
+function updateMobileDays() {
+  document.querySelectorAll(".day").forEach((el,index)=>{
+    el.classList.toggle("mobile-visible",mobileMode==="week" || index===currentDay);
   });
 }
 
-function showCurrentMobileDay() {
-  document.querySelectorAll(".day").forEach((day, index) => {
-    day.classList.toggle(
-      "mobile-visible",
-      mobileMode === "week" || index === currentDay
-    );
-  });
+function moveDay(delta) {
+  currentDay = (currentDay+delta+7)%7;
+  updateMobileDays();
 }
 
-function previousDay() {
-  currentDay = (currentDay + 6) % 7;
-  showCurrentMobileDay();
-}
+/* Обработчики кнопок */
+$("loginButton").addEventListener("click",sendLoginLink);
+$("emailInput").addEventListener("keydown",event=>{
+  if (event.key==="Enter") sendLoginLink();
+});
+$("logoutButton").addEventListener("click",logout);
+$("saveTemplateTop").addEventListener("click",saveTemplatePrompt);
+$("saveTemplateButton").addEventListener("click",saveTemplatePrompt);
+$("resetWeekButton").addEventListener("click",resetWeek);
+$("cancelModalButton").addEventListener("click",closeModal);
+$("saveTaskButton").addEventListener("click",saveTask);
+$("deleteTaskButton").addEventListener("click",deleteTask);
+$("dayModeButton").addEventListener("click",()=>setMobileMode("day"));
+$("weekModeButton").addEventListener("click",()=>setMobileMode("week"));
+$("previousDayButton").addEventListener("click",()=>moveDay(-1));
+$("nextDayButton").addEventListener("click",()=>moveDay(1));
+$("modalBackdrop").addEventListener("click",event=>{
+  if (event.target===$("modalBackdrop")) closeModal();
+});
 
-function nextDay() {
-  currentDay = (currentDay + 1) % 7;
-  showCurrentMobileDay();
-}
-window.login = login;
-window.logout = logout;
-window.saveTemplatePrompt = saveTemplatePrompt;
-window.resetWeek = resetWeek;
-window.setMobileMode = setMobileMode;
-window.previousDay = previousDay;
-window.nextDay = nextDay;
-window.closeModal = closeModal;
-window.saveTask = saveTask;
-window.deleteTask = deleteTask;
-/* ЗАПУСК */
-
+/* Запуск приложения */
 loadLocal();
 renderWeek();
 renderTemplates();
 
-const { data: sessionData } = await supabase.auth.getSession();
-await handleSession(sessionData.session);
+const {data:sessionResult,error:sessionError} = await supabase.auth.getSession();
 
-supabase.auth.onAuthStateChange((event, session) => {
-  if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
-    handleSession(session);
+if (sessionError) {
+  $("authMessage").textContent = "Не удалось проверить вход: " + sessionError.message;
+} else {
+  await handleSession(sessionResult.session);
+}
+
+supabase.auth.onAuthStateChange((event,session)=>{
+  if (event==="SIGNED_IN" || event==="SIGNED_OUT" || event==="TOKEN_REFRESHED") {
+    setTimeout(()=>handleSession(session),0);
   }
 });
 
-/* ПОЛУЧЕНИЕ ИЗМЕНЕНИЙ С ДРУГИХ УСТРОЙСТВ */
+/* Проверка изменений на других устройствах */
+setInterval(async()=>{
+  if (!currentUser || document.hidden || applyingCloudData) return;
 
-supabase
-  .channel("planner-sync")
-  .on(
-    "postgres_changes",
-    {
-      event: "*",
-      schema: "public",
-      table: "planner_data"
-    },
-    async payload => {
-      if (!currentUser) return;
-
-      if (payload.new && payload.new.user_id === currentUser.id) {
-        const cloudData = payload.new.data;
-
-        if (cloudData && Array.isArray(cloudData.weekData)) {
-          applyingCloudData = true;
-
-          weekData = cloudData.weekData;
-          templates = cloudData.templates || [];
-
-          saveLocal();
-          renderWeek();
-          renderTemplates();
-
-          applyingCloudData = false;
-        }
-      }
-    }
-  )
-  .subscribe();
-
-/* РЕЗЕРВНАЯ ПРОВЕРКА ОБЛАКА */
-
-setInterval(async () => {
-  if (!currentUser || document.hidden) return;
-
-  const { data, error } = await supabase
-    .from("planner_data")
-    .select("data, updated_at")
-    .eq("user_id", currentUser.id)
+  const {data,error} = await supabase.from("planner_data")
+    .select("data,updated_at")
+    .eq("user_id",currentUser.id)
     .maybeSingle();
 
-  if (error || !data || !data.data) return;
+  if (error || !data?.data) return;
 
-  const cloudTime = new Date(data.updated_at).getTime();
-  const localTime = Number(localStorage.getItem("lastCloudUpdate") || 0);
+  const remoteTime = data.updated_at ? new Date(data.updated_at).getTime() : 0;
 
-  if (cloudTime > localTime) {
+  if (remoteTime>lastCloudUpdate) {
     applyingCloudData = true;
 
-    weekData = data.data.weekData || weekData;
-    templates = data.data.templates || templates;
+    if (Array.isArray(data.data.weekData) && data.data.weekData.length===7) {
+      weekData = data.data.weekData;
+    }
+    if (Array.isArray(data.data.templates)) {
+      templates = data.data.templates;
+    }
 
+    lastCloudUpdate = remoteTime;
+    localStorage.setItem("lastCloudUpdate",String(lastCloudUpdate));
     saveLocal();
     renderWeek();
     renderTemplates();
 
-    localStorage.setItem("lastCloudUpdate", String(cloudTime));
-
     applyingCloudData = false;
   }
-}, 15000);
+},20000);
 
+supabase.channel("planner-sync")
+  .on("postgres_changes",{
+    event:"*",
+    schema:"public",
+    table:"planner_data"
+  },payload=>{
+    if (!currentUser || payload.new?.user_id!==currentUser.id || applyingCloudData) return;
+
+    const cloud = payload.new.data;
+    if (!cloud || !Array.isArray(cloud.weekData)) return;
+
+    const remoteTime = new Date(payload.new.updated_at).getTime();
+    if (remoteTime<=lastCloudUpdate) return;
+
+    applyingCloudData = true;
+    weekData = cloud.weekData;
+    templates = Array.isArray(cloud.templates) ? cloud.templates : [];
+    lastCloudUpdate = remoteTime;
+
+    localStorage.setItem("lastCloudUpdate",String(lastCloudUpdate));
+    saveLocal();
+    renderWeek();
+    renderTemplates();
+
+    applyingCloudData = false;
+  })
+  .subscribe();
 </script>
 </body>
 </html>
